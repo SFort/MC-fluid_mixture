@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "fluidmixture",
+  "version": "${version}",
+
+  "name": "Fluid Mixture",
+  "description": "Makes minecraft fluids finite (mostly)",
+  "authors": [
+    "SFort"
+  ],
+  "contact": {
+    "sources": "https://github.com/SFort/MC-fluid_mixture"
+  },
+
+  "license": "MIT",
+
+  "environment": "*",
+  "mixins": [
+    "fluidmixture.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": "*",
+    "fabric": "*",
+    "minecraft": "*"
+  }
+}

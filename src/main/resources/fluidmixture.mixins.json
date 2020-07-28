@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "tf.ssf.sfort.fluidmixture.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "FluidPiston",
+    "ShadowMaterial",
+    "Flow"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
