@@ -17,14 +17,14 @@ import net.minecraft.world.biome.Biome;
 public class FlowWater {
     public static void flow(WorldAccess world, BlockPos fluidPos, FluidState state) {
         if(world.isClient()){return;}
-        BlockState thisblock = world.getBlockState(fluidPos);
+        boolean thisblock = world.getBlockState(fluidPos).getBlock() instanceof FluidFillable;
         BlockState downblock = world.getBlockState(fluidPos.down());
         //TODO empty waterlogged block
         //TODO waterlog doors
         if (downblock.getBlock() instanceof FluidFillable) {
             if (!downblock.getProperties().contains(Properties.WATERLOGGED)){return;}
               if (!downblock.get(Properties.WATERLOGGED) && state.getFluid() == Fluids.WATER) {
-                    if (thisblock.getBlock() instanceof FluidFillable) {
+                    if (thisblock) {
                         world.setBlockState(fluidPos, downblock.with(Properties.WATERLOGGED, false), 3);
                     }
                     else{
@@ -34,41 +34,42 @@ public class FlowWater {
                   world.getFluidTickScheduler().schedule(fluidPos.down(), state.getFluid(), 15);
                 }
         }
-        if (thisblock.getBlock() instanceof FluidFillable ){
+        if (thisblock){
             return;
         }
         int downlvl = downblock.getFluidState().getLevel();
-        int thislvl = thisblock.getFluidState().getLevel();
+        int thislvl = world.getBlockState(fluidPos).getFluidState().getLevel();
         if (downlvl != 8 && downblock.canBucketPlace(state.getFluid())) {
-            int combined = downlvl+thislvl;
-            setLevel(combined-8, fluidPos,world, state);
-            setLevel(combined, fluidPos.down(),world, state);
+            setLevel(downlvl+thislvl-8, fluidPos,world, state);
+            setLevel(downlvl+thislvl, fluidPos.down(),world, state);
         } else {
             int i =0;
             Biome.Category inBiome = world.getBiome(fluidPos).getCategory();
             for (Direction side : Direction.Type.HORIZONTAL) {
                 BlockState sideblock = world.getBlockState(fluidPos.offset(side));
                 if (sideblock.canBucketPlace(state.getFluid())){
-                    Block tmpside = sideblock.getBlock();
+                    sideblock.getBlock();
                     int sidelvl =sideblock.getFluidState().getLevel();
                     if (sidelvl ==8){i++;}
-                    if (i>1 && state.getFluid().matchesType(Fluids.WATER)
-                            &&(inBiome == Biome.Category.OCEAN
-                            ||inBiome == Biome.Category.BEACH
-                            || inBiome == Biome.Category.RIVER)){
-                        //NOTE this does not generate water sources if on solid blocks it's a feature
-                        world.setBlockState(fluidPos, state.getFluid().getDefaultState().getBlockState(), 3);
-                    }
+
                     //TODO make water spread not prioritize north
                     if (thislvl-1 > sidelvl){
                         setLevel(thislvl-1, fluidPos,world,state);
                         thislvl=-1;
                         setLevel(sidelvl+1, fluidPos.offset(side),world,state);
-                        tmpside.dropStacks(sideblock,world.getWorld(), fluidPos.offset(side));
+                        Block.dropStacks(sideblock,world.getWorld(), fluidPos.offset(side));
                     }
 
                 }
             }
+            if (i>1 &&(state.getFluid().matchesType(Fluids.WATER)
+                    &&(inBiome == Biome.Category.OCEAN
+                    ||inBiome == Biome.Category.BEACH
+                    || inBiome == Biome.Category.RIVER))){
+                //NOTE this does not generate water sources if on solid blocks it's a feature
+                world.setBlockState(fluidPos, state.getFluid().getDefaultState().getBlockState(), 3);
+            }
+
         }
     }
 
