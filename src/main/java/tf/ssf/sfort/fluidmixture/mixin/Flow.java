@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import tf.ssf.sfort.fluidmixture.FlowWater;
+import tf.ssf.sfort.fluidmixture.FlowFluid;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
@@ -18,7 +18,7 @@ public class Flow {
 
     @Inject(at = @At("HEAD"), method = "onScheduledTick", cancellable = true)
     private void onScheduledTick(World world, BlockPos pos, FluidState state, CallbackInfo callback) {
-        FlowWater.flow(world, pos, state);
+        FlowFluid.flow(world, pos, state);
         callback.cancel();
     }
     @Inject(at = @At("HEAD"), method = "getUpdatedState", cancellable = true)
